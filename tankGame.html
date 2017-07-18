@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+</head>
+<body onkeydown="getCommand()">
+<h1>HTML5--坦克遊戲</h1>
+<canvas id="tankMap" width="400px" height="300px" style="background-color:black"></canvas>
+<script type="text/javascript" src="tankGame.js"></script>
+<script type="text/javascript">
+  
+  
+  var canvas1 = document.getElementById("tankMap");
+  var cxt = canvas1.getContext("2d");
+
+  //我的坦克
+  //方向0->上 1->右 2->下 3->左
+  var hero=new Hero(180,240,0,heroColor);
+  //定義子彈陣列
+  var heroBullets=new Array();
+  
+  //敵人的坦克
+  var enemyTanks=new Array();
+  
+  //敵人的子彈
+  var enemyBullets=new Array();
+  
+  //炸彈
+  var bombs=new Array();
+  
+  for(var i=0;i<3;i++){
+    //創建一個坦克
+    var enemyTank=new Enemy((i+1)*90,0,2,enemyColor);
+	//把坦克放到array
+	enemyTanks[i]=enemyTank;
+	//啟動敵人的坦克
+	window.setInterval("enemyTanks["+i+"].run()",50);
+	//當創建敵人坦克時就分配子彈
+	var eb=new Bullet(enemyTanks[i].x+9,enemyTanks[i].y+30,2,1.2,"enemy",enemyTanks[i]);
+	enemyBullets[i]=eb;
+	//啟動該子彈
+	var ettimer=window.setInterval("enemyBullets["+i+"].run()",50);
+    enemyBullets[i].timer=ettimer;
+  }
+
+  //起始
+  refreshTankMap();
+  
+  //定時刷新作戰區
+  function refreshTankMap(){
+    //清畫布
+	cxt.clearRect(0,0,400,300);
+	//判斷我的坦克是否被擊中
+	isHitHeroTank();
+    //我的坦克
+	drawTank(hero);
+	//畫子彈
+	drawBullet();
+	//判斷敵人的坦克是否被擊中
+	isHitEnemyTank();
+	drawBomb();
+	drawEnemyBullet();
+	//敵人的坦克
+	for(var i=0;i<3;i++){
+	  drawTank(enemyTanks[i]);
+	}
+  }
+
+  
+  
+  function getCommand(){
+    
+    var code = event.keyCode;
+	//alert(code);
+	switch(code){
+	  case 87:
+	  case 38:
+	    //上
+		hero.moveUp();
+	    break;
+	  case 68:
+	  case 39:
+	    //右
+		hero.moveRight();
+	    break;
+      case 83:
+	  case 40:
+	    //下
+		hero.moveDown();
+	    break;
+	  case 65:
+	  case 37:
+	    //左
+		hero.moveLeft();
+	    break;
+      case 74:
+	    hero.shot();
+	    break;
+	}
+	//觸發刷新作戰區的function
+	refreshTankMap();
+	
+  }
+  //每隔100毫秒刷新作戰區
+  window.setInterval("refreshTankMap()",100);
+</script>
+</body>
+</html>
